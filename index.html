@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matchday Passport — Be there. Get the stamp.</title>
+<meta name="description" content="A passport for football fans. Press a stamp into your book every time you see a match. The full 2026 schedule built in. Coming to the App Store.">
+<meta property="og:title" content="Matchday Passport">
+<meta property="og:description" content="Be there. Get the stamp. Your summer of soccer, one stamp at a time.">
+<link rel="icon" type="image/png" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#13301f; --green-2:#1c4530; --green-3:#0c2418;
+    --paper:#f4efe1; --paper-2:#efe8d6; --edge:#d8ccae;
+    --ink:#231f17; --ink-soft:#6a6049;
+    --gold:#c9a24a; --gold-hi:#ecd48c; --gold-deep:#8a6d28;
+    --claret:#8e2a2a; --navy:#22386b; --forest:#1f5236;
+    --serif:"Fraunces",Georgia,serif;
+    --read:"Newsreader",Georgia,serif;
+    --mono:"Space Mono",ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--read); color:var(--ink); background:var(--paper);
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  /* paper grain overlay everywhere */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+  ::selection{background:var(--gold);color:var(--green-3)}
+
+  /* ---------- shared ---------- */
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold-deep)}
+  .mrz{font-family:var(--mono);letter-spacing:.18em;text-transform:uppercase}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- COVER / HERO ---------- */
+  .cover{
+    min-height:100svh; position:relative; color:var(--paper);
+    background:
+      radial-gradient(130% 110% at 28% 18%, #21503c 0%, #173a2b 44%, #0c2418 100%);
+    display:flex; flex-direction:column;
+    border-bottom:1px solid #000;
+    overflow:hidden;
+  }
+  .cover::after{ /* embossed gold frame */
+    content:""; position:absolute; inset:22px; border:2px solid rgba(201,162,74,.34);
+    border-radius:6px; pointer-events:none;
+  }
+  .cover-grain{position:absolute;inset:0;opacity:.18;mix-blend-mode:overlay;
+    background-image:radial-gradient(rgba(255,255,255,.6) .6px,transparent 1.2px);background-size:6px 6px}
+  .cover .wrap{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;z-index:2;padding-top:60px;padding-bottom:40px}
+
+  .emblem{width:188px;height:188px;filter:drop-shadow(0 8px 26px rgba(0,0,0,.45));animation:press .9s cubic-bezier(.2,1.4,.3,1) both}
+  @keyframes press{0%{opacity:0;transform:scale(1.5) rotate(-8deg)}60%{opacity:1}100%{opacity:1;transform:none}}
+
+  .doc-type{font-family:var(--mono);font-size:13px;letter-spacing:.4em;color:var(--gold);margin-top:26px;opacity:0;animation:rise .8s .3s both}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(44px,9vw,104px);line-height:.94;
+    letter-spacing:-.01em;margin-top:10px;
+    background:linear-gradient(180deg,#f3dd9a,#c9a24a 60%,#9c7a30);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 1px 0 rgba(0,0,0,.15);
+    opacity:0;animation:rise .9s .42s both;
+  }
+  .title em{font-style:italic;font-weight:400}
+  .tagline{font-family:var(--read);font-size:clamp(17px,2.4vw,22px);color:#e7dfca;max-width:30ch;margin:22px auto 0;line-height:1.5;opacity:0;animation:rise .9s .56s both}
+  @keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:34px;opacity:0;animation:rise .9s .7s both}
+  .badge{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    padding:14px 22px;border-radius:40px;border:1px solid rgba(201,162,74,.5);color:var(--gold-hi);background:rgba(0,0,0,.18)}
+  .badge.solid{background:linear-gradient(180deg,#ecd48c,#c9a24a);color:#1a3a28;border:none;font-weight:700}
+  .badge svg{width:16px;height:16px}
+
+  /* MRZ strip at bottom of cover */
+  .mrz-strip{position:relative;z-index:2;border-top:1px dashed rgba(201,162,74,.4);
+    padding:16px 0;overflow:hidden;white-space:nowrap;opacity:0;animation:rise .9s .9s both}
+  .mrz-strip .mrz{font-size:13px;color:rgba(201,162,74,.62);display:inline-block;padding-left:100%;animation:scrollmrz 32s linear infinite}
+  @keyframes scrollmrz{to{transform:translateX(-100%)}}
+
+  .scrollhint{position:absolute;bottom:74px;left:50%;transform:translateX(-50%);z-index:3;
+    font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:rgba(231,223,202,.6);text-transform:uppercase;animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,8px)}}
+
+  /* ---------- PAGES ---------- */
+  section.page{padding:clamp(80px,12vw,150px) 0;position:relative}
+  .page--cream{background:
+    linear-gradient(var(--paper),var(--paper))}
+  .page--cream:nth-of-type(even){background:var(--paper-2)}
+  .pageno{position:absolute;top:30px;right:34px;font-family:var(--mono);font-size:11px;color:var(--edge);letter-spacing:.2em}
+
+  .lead{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+  @media(max-width:820px){.lead{grid-template-columns:1fr;gap:40px}}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(32px,5vw,58px);line-height:1.02;letter-spacing:-.015em;color:var(--ink)}
+  h2 em{font-style:italic;color:var(--forest)}
+  .lead p{font-size:19px;line-height:1.66;color:#403a2c;margin-top:22px;max-width:46ch}
+  .lead p+p{margin-top:14px}
+
+  /* live stamp cluster */
+  .stamp-cluster{position:relative;height:420px}
+  .stamp{position:absolute;filter:drop-shadow(0 6px 14px rgba(0,0,0,.12))}
+  .stamp svg{display:block}
+  .s1{top:6%;left:8%;transform:rotate(-7deg)}
+  .s2{top:30%;right:4%;transform:rotate(6deg)}
+  .s3{bottom:4%;left:24%;transform:rotate(-3deg)}
+
+  /* device / passport page frame */
+  .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:8px}
+  @media(max-width:820px){.shots{grid-template-columns:1fr;max-width:340px;margin:8px auto 0}}
+  .phone{position:relative;border-radius:42px;padding:10px;background:linear-gradient(160deg,#222,#000);
+    box-shadow:0 30px 60px -24px rgba(20,30,20,.55),0 2px 0 rgba(255,255,255,.06) inset;
+    transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .phone:hover{transform:translateY(-10px) rotate(-1deg)}
+  .phone img{width:100%;display:block;border-radius:32px}
+  .phone .cap{position:absolute;left:0;right:0;bottom:-34px;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+  .shots{margin-bottom:44px}
+
+  /* big editorial stat */
+  .stat-band{background:var(--green-3);color:var(--paper);position:relative;overflow:hidden}
+  .stat-band::after{content:"";position:absolute;inset:22px;border:2px solid rgba(201,162,74,.28);border-radius:6px;pointer-events:none}
+  .stat-inner{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;position:relative;z-index:2}
+  @media(max-width:820px){.stat-inner{grid-template-columns:1fr;text-align:center}}
+  .bignum{font-family:var(--serif);font-weight:600;font-size:clamp(96px,18vw,210px);line-height:.82;
+    background:linear-gradient(180deg,#f3dd9a,#c9a24a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat-inner h2{color:var(--paper)}
+  .stat-inner p{color:#cfc7af;font-size:19px;line-height:1.6;margin-top:18px;max-width:42ch}
+  @media(max-width:820px){.stat-inner p{margin-inline:auto}}
+
+  /* feature triptych */
+  .tri{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:54px}
+  @media(max-width:820px){.tri{grid-template-columns:1fr;gap:22px}}
+  .card{background:var(--paper);border:1px solid var(--edge);border-radius:16px;padding:30px 26px;position:relative}
+  .page--cream:nth-of-type(even) .card{background:#f8f2e3}
+  .card .ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(201,162,74,.16);margin-bottom:18px}
+  .card .ic svg{width:22px;height:22px;stroke:var(--gold-deep)}
+  .card h3{font-family:var(--serif);font-size:23px;font-weight:600;color:var(--ink)}
+  .card p{margin-top:10px;color:#4a4334;line-height:1.6;font-size:16px}
+
+  /* CTA */
+  .final{text-align:center;background:radial-gradient(120% 100% at 50% 0,#21503c,#0c2418);color:var(--paper);position:relative}
+  .final::after{content:"";position:absolute;inset:22px;border:2px solid rgba(201,162,74,.3);border-radius:6px;pointer-events:none}
+  .final h2{color:transparent;background:linear-gradient(180deg,#f3dd9a,#c9a24a);-webkit-background-clip:text;background-clip:text;font-size:clamp(36px,6vw,72px)}
+  .final p{color:#dcd4bd;font-size:19px;margin:20px auto 0;max-width:34ch;line-height:1.55}
+
+  /* footer */
+  footer{background:var(--green-3);color:#b9b09a;padding:54px 0 34px;font-size:14px}
+  footer .wrap{display:flex;flex-direction:column;gap:24px}
+  .foot-top{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+  .foot-brand{display:flex;align-items:center;gap:14px}
+  .foot-brand img{width:46px;height:46px;border-radius:11px}
+  .foot-brand b{font-family:var(--serif);color:var(--gold-hi);font-size:19px;font-weight:600}
+  footer a{color:#cdc4ad;text-decoration:none;border-bottom:1px solid rgba(201,162,74,.3);padding-bottom:1px}
+  footer a:hover{color:var(--gold-hi)}
+  .foot-links{display:flex;gap:24px;flex-wrap:wrap}
+  .disclaimer{border-top:1px dashed rgba(201,162,74,.25);padding-top:20px;color:#8c8470;line-height:1.6;font-size:12.5px}
+  .foot-mrz{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:rgba(201,162,74,.4);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<header class="cover">
+  <div class="cover-grain"></div>
+  <div class="wrap">
+    <svg class="emblem" viewBox="0 0 200 200" aria-hidden="true">
+      <defs><radialGradient id="cg" cx="30%" cy="22%"><stop offset="0" stop-color="#21503c"/><stop offset="1" stop-color="#0e2a1f"/></radialGradient></defs>
+      <circle cx="100" cy="100" r="96" fill="url(#cg)"/>
+      <circle cx="100" cy="100" r="74" fill="none" stroke="#c9a24a" stroke-width="2.4"/>
+      <circle cx="100" cy="100" r="64" fill="none" stroke="rgba(201,162,74,.55)" stroke-width="1"/>
+      <g id="emdots"></g>
+      <path id="emtop" d="M 44 100 A 56 56 0 0 1 156 100" fill="none"/>
+      <path id="embot" d="M 50 100 A 50 50 0 0 0 150 100" fill="none"/>
+      <text fill="#e7c97a" font-family="Fraunces,serif" font-weight="700" font-size="15" letter-spacing="4" text-anchor="middle"><textPath href="#emtop" startOffset="50%">MATCHDAY</textPath></text>
+      <text fill="#cdaa5e" font-family="Fraunces,serif" font-weight="700" font-size="13" letter-spacing="6" text-anchor="middle"><textPath href="#embot" startOffset="50%">PASSPORT</textPath></text>
+      <polygon id="emstar" fill="#f0d488" stroke="#a07e34" stroke-width="1.4" stroke-linejoin="round"/>
+      <polygon id="empent" fill="#173a2b" opacity=".9"/>
+    </svg>
+
+    <div class="doc-type">PASSEPORT · PASAPORTE · PASSPORT</div>
+    <h1 class="title">Matchday<br><em>Passport</em></h1>
+    <p class="tagline">Be there. Get the stamp. Your summer of soccer — one match, one stamp, one memory at a time.</p>
+
+    <div class="cta-row">
+      <span class="badge solid">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 3c.1 1-.3 2-1 2.8-.7.8-1.7 1.3-2.7 1.2-.1-1 .4-2 1-2.7.7-.8 1.8-1.3 2.7-1.3Zm2.5 14c-.5 1.1-.8 1.6-1.4 2.6-.9 1.3-2.1 3-3.7 3-1.4 0-1.7-.9-3.6-.9s-2.3.9-3.6.9c-1.6 0-2.8-1.5-3.6-2.8C1.3 17 1 12.7 2.9 10.5c.9-1.1 2.2-1.7 3.4-1.7 1.5 0 2.4 1 3.6 1 1.2 0 1.9-1 3.6-1 1.1 0 2.3.6 3.1 1.6-2.7 1.5-2.3 5.3.4 6.6Z"/></svg>
+        Coming to the App Store
+      </span>
+      <a class="badge" href="#inside">Take a look inside ↓</a>
+    </div>
+  </div>
+
+  <div class="mrz-strip">
+    <span class="mrz">P&lt;USA·MATCHDAY&lt;&lt;PASSPORT&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&nbsp;&nbsp; BE&lt;THERE&lt;GET&lt;THE&lt;STAMP&lt;&lt;SOCCER&lt;2026&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&nbsp;&nbsp;</span>
+  </div>
+  <div class="scrollhint">scroll to open</div>
+</header>
+
+<!-- ============ BE THERE ============ -->
+<section class="page page--cream" id="inside">
+  <span class="pageno">— 01 —</span>
+  <div class="wrap lead">
+    <div class="reveal">
+      <div class="eyebrow">The hero moment</div>
+      <h2 style="margin-top:18px">Live in the stadium is the <em>one that counts.</em></h2>
+      <p>Press a stamp the moment you take your seat. Attend in person and you earn a full, richly inked stamp — unique to that match. Follow from afar and you get a quieter mark.</p>
+      <p>Your passport shows, at a glance, exactly where you've been.</p>
+    </div>
+    <div class="stamp-cluster reveal">
+      <div class="stamp s1" data-stamp="wc"></div>
+      <div class="stamp s2" data-stamp="home"></div>
+      <div class="stamp s3" data-stamp="watch"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREENSHOTS ============ -->
+<section class="page page--cream">
+  <span class="pageno">— 02 —</span>
+  <div class="wrap">
+    <div class="reveal" style="text-align:center;max-width:640px;margin:0 auto 56px">
+      <div class="eyebrow">Inside the book</div>
+      <h2 style="margin-top:16px">A collectible you'll actually <em>open.</em></h2>
+    </div>
+    <div class="shots reveal">
+      <div class="phone"><img src="img/passport.png" alt="The passport book of stamps" loading="lazy"><span class="cap">The Passport</span></div>
+      <div class="phone"><img src="img/summer26.png" alt="The 2026 schedule and collection board" loading="lazy"><span class="cap">Summer '26</span></div>
+      <div class="phone"><img src="img/myteam.png" alt="Your team's record and lucky-charm rate" loading="lazy"><span class="cap">Your Team</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LUCKY CHARM STAT ============ -->
+<section class="page stat-band">
+  <span class="pageno" style="color:rgba(201,162,74,.4)">— 03 —</span>
+  <div class="wrap stat-inner">
+    <div class="reveal"><div class="bignum">100%</div></div>
+    <div class="reveal">
+      <div class="eyebrow">The lucky charm</div>
+      <h2 style="margin-top:16px">How often does your team <em>win when you're there?</em></h2>
+      <p>Pick your club or country and Matchday Passport tracks your live win–draw–loss record, your supporter level, and the stat every fan secretly believes in — your lucky-charm rate.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SUMMER 26 / FEATURES ============ -->
+<section class="page page--cream">
+  <span class="pageno">— 04 —</span>
+  <div class="wrap">
+    <div class="reveal" style="max-width:620px">
+      <div class="eyebrow">Built for the big summer</div>
+      <h2 style="margin-top:16px">All 104 matches. <em>Two taps</em> to check in.</h2>
+      <p style="font-size:19px;line-height:1.6;color:#403a2c;margin-top:20px">The full 2026 schedule across the United States, Canada and Mexico is built in and fully offline — every date, venue and fixture. Collect host stadiums, knockout nights, and the final.</p>
+    </div>
+    <div class="tri">
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <h3>Stamp in seconds</h3>
+        <p>Pick the fixture, choose "I was there", press the stamp. A full-screen, ink-pressed payoff with haptics — then a share card built for the group chat.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M9 4v16"/></svg></div>
+        <h3>Yours, on your phone</h3>
+        <p>No account. No sign-up. No tracking. No ads. Everything lives on your device — nothing is ever collected or uploaded.</p>
+      </div>
+      <div class="card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 2l2.6 6.6L21 9l-5 4.4L17.5 21 12 17l-5.5 4L8 13.4 3 9l6.4-.4Z"/></svg></div>
+        <h3>Milestones worth chasing</h3>
+        <p>First ink. Groundhopper. Knockout Nights. "I Was There." Badges and supporter levels that grow with every match you collect.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="page final">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="color:var(--gold)">Summer 2026</div>
+    <h2 style="margin-top:14px">Start your book.</h2>
+    <p>Coming soon to the App Store. The first stamp is the one you'll remember.</p>
+    <div class="cta-row" style="margin-top:30px;animation:none;opacity:1">
+      <span class="badge solid">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 3c.1 1-.3 2-1 2.8-.7.8-1.7 1.3-2.7 1.2-.1-1 .4-2 1-2.7.7-.8 1.8-1.3 2.7-1.3Zm2.5 14c-.5 1.1-.8 1.6-1.4 2.6-.9 1.3-2.1 3-3.7 3-1.4 0-1.7-.9-3.6-.9s-2.3.9-3.6.9c-1.6 0-2.8-1.5-3.6-2.8C1.3 17 1 12.7 2.9 10.5c.9-1.1 2.2-1.7 3.4-1.7 1.5 0 2.4 1 3.6 1 1.2 0 1.9-1 3.6-1 1.1 0 2.3.6 3.1 1.6-2.7 1.5-2.3 5.3.4 6.6Z"/></svg>
+        App Store · soon
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand"><img src="img/icon.png" alt=""><b>Matchday Passport</b></div>
+      <div class="foot-links">
+        <a href="privacy-policy.html">Privacy</a>
+        <a href="support.html">Support</a>
+        <a href="mailto:cnwt20060606@outlook.com">Contact</a>
+      </div>
+    </div>
+    <div class="disclaimer">
+      Matchday Passport is an independent fan app. It is not affiliated with, endorsed by, sponsored by, or connected to FIFA, any national football association, or any official tournament organizer. The match schedule is provided as publicly available factual information for personal reference.
+    </div>
+    <div class="foot-mrz">P&lt;USA·MATCHDAY&lt;&lt;PASSPORT&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;2026&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+  </div>
+</footer>
+
+<script>
+const SVGNS="http://www.w3.org/2000/svg";
+// scallop dots + star for the cover emblem
+(function(){
+  const g=document.getElementById("emdots"),cx=100,cy=100,R=84,n=44;
+  for(let i=0;i<n;i++){const a=i/n*Math.PI*2,x=cx+Math.cos(a)*R,y=cy+Math.sin(a)*R;
+    const c=document.createElementNS(SVGNS,"circle");c.setAttribute("cx",x);c.setAttribute("cy",y);
+    c.setAttribute("r",i%2?.9:1.7);c.setAttribute("fill",i%2?"#cdaa5e":"#e7c97a");g.appendChild(c);}
+  function starPts(cx,cy,rad){const inner=rad*.42,p=[];for(let i=0;i<10;i++){const r=i%2===0?rad:inner;
+    const a=-Math.PI/2+i*Math.PI/5;p.push((cx+Math.cos(a)*r).toFixed(1)+","+(cy+Math.sin(a)*r).toFixed(1));}return p.join(" ");}
+  document.getElementById("emstar").setAttribute("points",starPts(100,100,38));
+  const pp=[];for(let i=0;i<5;i++){const a=-Math.PI/2+i*2*Math.PI/5;pp.push((100+Math.cos(a)*6.8).toFixed(1)+","+(101.6+Math.sin(a)*6.8).toFixed(1));}
+  document.getElementById("empent").setAttribute("points",pp.join(" "));
+})();
+
+// procedural ink stamps for the "be there" cluster (mirrors the app's StampDesigner)
+function inkStamp(opts){
+  const {top,bottom,left,right,main,ink,gold,faded,shape,size=150}=opts;
+  const color=gold?"#b58a2f":ink;const op=faded?.42:1;
+  const c=size/2,R=size/2-size*0.06;
+  const NS=SVGNS;const svg=document.createElementNS(NS,"svg");
+  svg.setAttribute("viewBox",`0 0 ${size} ${size}`);svg.setAttribute("width",size);svg.setAttribute("height",size);
+  svg.style.opacity=op;
+  function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+  // border
+  let border;
+  if(shape==="scallop"){let d="";const bumps=24,inner=R*0.93;
+    for(let i=0;i<=bumps*6;i++){const t=i/(bumps*6),a=t*Math.PI*2,w=Math.sin(t*bumps*Math.PI*2);
+      const r=inner+(R-inner)*(w>0?w:0);const x=c+Math.cos(a)*r,y=c+Math.sin(a)*r;d+=(i?"L":"M")+x.toFixed(1)+" "+y.toFixed(1);}
+    d+="Z";border=el("path",{d,fill:"none",stroke:color,"stroke-width":R*0.05});}
+  else if(shape==="shield"){const w=R*1.5,h=R*1.85,x=c-w/2,y=c-h/2;
+    const d=`M${x} ${y} L${x+w} ${y} L${x+w} ${y+h*0.55} Q${x+w} ${y+h*0.94} ${c} ${y+h} Q${x} ${y+h*0.94} ${x} ${y+h*0.55} Z`;
+    border=el("path",{d,fill:"none",stroke:color,"stroke-width":R*0.05,"stroke-linejoin":"round"});}
+  else if(shape==="rsquare"){const s=R*1.55;border=el("rect",{x:c-s/2,y:c-s/2,width:s,height:s,rx:R*0.22,fill:"none",stroke:color,"stroke-width":R*0.05,"stroke-dasharray":`${R*0.14} ${R*0.07}`});}
+  else{border=el("circle",{cx:c,cy:c,r:R,fill:"none",stroke:color,"stroke-width":R*0.05});}
+  svg.appendChild(border);
+  if(shape==="circle"||shape==="scallop")svg.appendChild(el("circle",{cx:c,cy:c,r:R*0.8,fill:"none",stroke:color,"stroke-width":R*0.018,opacity:.75}));
+  // arc text
+  function arc(id,str,rad,topSide,fs){
+    const path=el("path",{id,fill:"none",d:topSide?`M ${c-rad} ${c} A ${rad} ${rad} 0 0 1 ${c+rad} ${c}`:`M ${c-rad} ${c} A ${rad} ${rad} 0 0 0 ${c+rad} ${c}`});
+    const defs=el("defs",{});defs.appendChild(path);svg.appendChild(defs);
+    const t=el("text",{fill:color,"font-family":"Space Mono, monospace","font-weight":"700","font-size":fs,"letter-spacing":"1.5","text-anchor":"middle"});
+    const tp=document.createElementNS(NS,"textPath");tp.setAttribute("href","#"+id);tp.setAttribute("startOffset","50%");tp.textContent=str;t.appendChild(tp);svg.appendChild(t);
+  }
+  arc("t"+Math.random().toString(36).slice(2),top,R*0.9,true,R*0.12);
+  arc("b"+Math.random().toString(36).slice(2),bottom,R*0.9,false,R*0.12);
+  // center
+  function txt(s,x,y,fs,w,fam){const t=el("text",{fill:color,x,y,"font-size":fs,"font-weight":w,"text-anchor":"middle","dominant-baseline":"middle","font-family":fam||"Fraunces, serif"});t.textContent=s;svg.appendChild(t);}
+  txt(left,c-R*0.38,c-R*0.2,R*0.16,800,"Space Mono, monospace");
+  txt("v",c,c-R*0.2,R*0.13,400);
+  txt(right,c+R*0.38,c-R*0.2,R*0.16,800,"Space Mono, monospace");
+  txt(main,c,c+R*0.16,main==="VS"?R*0.24:R*0.32,900);
+  return svg;
+}
+const specs={
+  wc:{shape:"scallop",gold:true,top:"ESTADIO AZTECA",bottom:"11 JUN 2026",left:"MEX",right:"RSA",main:"2–1"},
+  home:{shape:"shield",ink:"#8e2a2a",top:"ROSE BOWL",bottom:"02 MAY 2026",left:"MEX",right:"USA",main:"2–0"},
+  watch:{shape:"rsquare",ink:"#22386b",faded:true,top:"ON TV",bottom:"13 JUN 2026",left:"BRA",right:"MAR",main:"0–2"}
+};
+document.querySelectorAll("[data-stamp]").forEach(d=>{d.appendChild(inkStamp({...specs[d.dataset.stamp],size:172}));});
+
+// scroll reveals
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}})},{threshold:.18});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
